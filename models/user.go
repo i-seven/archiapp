@@ -4,8 +4,8 @@ import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
-	Username string
-	Email    string `gorm:"unique"`
-	Password string
+	Email    string `gorm:"uniqueIndex;size:255;not null"`
+	Password string `grom:"size:255;not null"`
+	Name     string `grom:"size:255"`
 	Role     string `gorm:"default:'user'"`
 }

@@ -1,91 +1,64 @@
+const BASE_URL = "http://localhost:8080";
+
 let authToken = "";
 
-// First, login to get the token
-function testLogin() {
+// Signup a new user
+async function testSignup() {
   const user = {
-    email: "hadimousavi.543@gmail.com",
+    email: "savi.543@gmail.com",
     password: "Uyjhmn65@!",
+    name: "iz7zi"
   };
 
-  fetch('http://localhost:3000/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(user)
-  })
-    .then(res => res.json())
-    .then(data => {
-      console.log('Logged in:', data);
-      authToken = data.token; // Save token for later requests
+  try {
+    const res = await fetch(`${BASE_URL}/users/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(user),
+    });
+    const data = await res.json();
+    console.log("Signup response:", data);
+  } catch (err) {
+    console.error("Signup error:", err);
+  }
+}
+async function testLogin() {
+  const res = await fetch('http://localhost:8080/users/login', {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      email: "savi.543@gmail.com",
+      password: "Uyjhmn65@!"
     })
-    .catch(err => console.error('Login error:', err));
+  });
+  const data = await res.json();
+  console.log("Login response:", data);
+  authToken = data.token;
 }
 
-// Create a product (requires auth)
-function testCreateProduct() {
-  const product = {
-    name: "Test Product",
-    price: 99.99,
-    description: "A product for testing"
-  };
-
-  fetch('http://localhost:3000/products', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`
-    },
-    body: JSON.stringify(product)
-  })
-    .then(res => res.json())
-    .then(data => console.log('Created product:', data))
-    .catch(err => console.error('Error:', err));
+// Get current logged-in user
+async function testMe() {
+  try {
+    const res = await fetch(`${BASE_URL}/users/me`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${authToken}`,
+      },
+    });
+    const data = await res.json();
+    console.log("Current user (/me):", data);
+  } catch (err) {
+    console.error("Me error:", err);
+  }
 }
 
-// Update a product (requires auth)
-function testUpdateProduct(id) {
-  const updated = {
-    name: "Updated Product",
-    price: 79.99
-  };
+// Run the test sequence
+(async () => {
+  // Optional: signup first if user does not exist
+  // await testSignup();
 
-  fetch(`http://localhost:3000/products/${id}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${authToken}`
-    },
-    body: JSON.stringify(updated)
-  })
-    .then(res => res.json())
-    .then(data => console.log('Updated product:', data))
-    .catch(err => console.error('Error:', err));
-}
 
-// Delete a product (requires auth)
-function testDeleteProduct(id) {
-  fetch(`http://localhost:3000/products/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Authorization': `Bearer ${authToken}`
-    }
-  })
-    .then(res => res.json())
-    .then(data => console.log('Deleted product:', data))
-    .catch(err => console.error('Error:', err));
-}
-
-// GET requests don't require auth unless you enforce it
-function testGetProducts() {
-  fetch('http://localhost:3000/products')
-    .then(res => res.json())
-    .then(data => console.log('All products:', data))
-    .catch(err => console.error('Error:', err));
-}
-
-function testGetProduct(id) {
-  fetch(`http://localhost:3000/products/${id}`)
-    .then(res => res.json())
-    .then(data => console.log('Single product:', data))
-    .catch(err => console.error('Error:', err));
-}
-
+  await testSignup();   // login and set authToken
+  await testLogin();   // login and set authToken
+  await testMe();      // call protected route using token
+})();
