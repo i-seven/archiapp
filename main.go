@@ -3,6 +3,8 @@ package main
 import (
 	"backendAf/config"
 	"backendAf/routes"
+	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,14 +16,33 @@ func init() {
 }
 
 func main() {
-
+	// gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
-	// Serve static images
+	// 1. FIRST: Serve static images
 	r.Static("/images", "./storage/images")
 
+	// 2. SECOND: Register all routes
 	routes.RegisterRoutes(r)
 
-	r.Run(":8080")
+	//// 3. THIRD: Setup HTTPS
+	// m := &autocert.Manager{
+	// 	Cache:      autocert.DirCache("certs"),
+	// 	Prompt:     autocert.AcceptTOS,
+	// 	HostPolicy: autocert.HostWhitelist("example.com"), // Change to your domain
+	// }
 
+	server := &http.Server{
+		Addr:    ":80",
+		Handler: r, // This r now has all routes registered
+		// TLSConfig: m.TLSConfig(),
+	}
+
+	// 4. Start HTTP->HTTPS redirector
+	// go http.ListenAndServe(":80", m.HTTPHandler(nil))
+
+	// 5. FINALLY: Start the HTTPS server
+	log.Printf("Starting HTTPS server on :80")
+	log.Fatal(server.ListenAndServe())
+	// log.Fatal(server.ListenAndServeTLS("cert.pem", "key.pem"))
 }
