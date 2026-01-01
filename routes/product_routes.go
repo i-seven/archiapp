@@ -14,7 +14,6 @@ func RegisterProductRoutes(r *gin.Engine) {
 	{
 		p.Use(middleware.RequireAdmin())
 		{
-
 			p.POST("/", controllers.CreateProduct)
 			p.GET("/", controllers.GetProducts)
 			p.GET("/:id", controllers.GetProduct)

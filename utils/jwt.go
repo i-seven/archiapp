@@ -20,6 +20,7 @@ func GenerateToken(userID uint, role string) (string, error) {
 // ParseToken validates and parses a JWT string returning the token and claims map.
 // It verifies signature with the secret in config.JWTSecret.
 func ParseToken(tokenStr string) (*jwt.Token, jwt.MapClaims, error) {
+
 	if tokenStr == "" {
 		return nil, nil, errors.New("token is empty")
 	}
