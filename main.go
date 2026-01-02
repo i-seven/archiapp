@@ -4,7 +4,6 @@ import (
 	"backendAf/config"
 	"backendAf/routes"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,17 +31,18 @@ func main() {
 	// 	HostPolicy: autocert.HostWhitelist("example.com"), // Change to your domain
 	// }
 
-	server := &http.Server{
-		Addr:    ":80",
-		Handler: r, // This r now has all routes registered
-		// TLSConfig: m.TLSConfig(),
-	}
+	// server := &http.Server{
+	// 	Addr:    ":80",
+	// 	Handler: r, // This r now has all routes registered
+	// 	// TLSConfig: m.TLSConfig(),
+	// }
 
 	// 4. Start HTTP->HTTPS redirector
 	// go http.ListenAndServe(":80", m.HTTPHandler(nil))
 
 	// 5. FINALLY: Start the HTTPS server
 	log.Printf("Starting HTTPS server on :80")
-	log.Fatal(server.ListenAndServe())
+	// log.Fatal(server.ListenAndServe())
+	r.Run(":80")
 	// log.Fatal(server.ListenAndServeTLS("cert.pem", "key.pem"))
 }
