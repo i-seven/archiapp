@@ -58,7 +58,7 @@ async function testMe() {
   // await testSignup();
 
 
-  await testSignup();   // login and set authToken
-  await testLogin();   // login and set authToken
-  await testMe();      // call protected route using token
+  await testSignup();
+  await testLogin();
+  await testMe(); 
 })();

@@ -3,7 +3,8 @@ package main
 import (
 	"backendAf/config"
 	"backendAf/routes"
-	"log"
+	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,35 +15,63 @@ func init() {
 	config.SyncDB()
 }
 
+// CORS Middleware
+func CORS() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		origin := c.Request.Header.Get("Origin")
+
+		// Allow specific origins (you can change to "*" for all)
+		allowedOrigins := []string{
+			"http://localhost:5173", // Add this
+			"http://127.0.0.1:5173", // Add this
+		}
+
+		for _, allowedOrigin := range allowedOrigins {
+			if origin == allowedOrigin {
+				c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+				break
+			}
+		}
+
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
+}
+
 func main() {
-	// gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
-	// 1. FIRST: Serve static images
-	r.Static("/images", "./storage/images")
+	r.Use(func(c *gin.Context) {
+		start := time.Now()
+		path := c.Request.URL.Path
+		method := c.Request.Method
 
-	// 2. SECOND: Register all routes
-	routes.RegisterRoutes(r)
+		c.Next()
 
-	//// 3. THIRD: Setup HTTPS
-	// m := &autocert.Manager{
-	// 	Cache:      autocert.DirCache("certs"),
-	// 	Prompt:     autocert.AcceptTOS,
-	// 	HostPolicy: autocert.HostWhitelist("example.com"), // Change to your domain
-	// }
+		latency := time.Since(start)
+		fmt.Printf("[%s] %s %s | Status: %d | Latency: %v\n",
+			method, path, c.ClientIP(), c.Writer.Status(), latency)
+	})
+	// Use CORS middleware
+	r.Use(CORS())
 
-	// server := &http.Server{
-	// 	Addr:    ":80",
-	// 	Handler: r, // This r now has all routes registered
-	// 	// TLSConfig: m.TLSConfig(),
-	// }
+	// Test endpoint
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok"})
+	})
 
-	// 4. Start HTTP->HTTPS redirector
-	// go http.ListenAndServe(":80", m.HTTPHandler(nil))
+	// Register routes
+	routes.RegisterUserRoutes(r)
 
-	// 5. FINALLY: Start the HTTPS server
-	log.Printf("Starting HTTPS server on :80")
-	// log.Fatal(server.ListenAndServe())
-	r.Run(":80")
-	// log.Fatal(server.ListenAndServeTLS("cert.pem", "key.pem"))
+	// Start server
+	println("Server starting on :8080...")
+	r.Run(":8080")
 }
