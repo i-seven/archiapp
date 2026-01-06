@@ -20,7 +20,7 @@ func RegisterProductRoutes(r *gin.Engine) {
 
 	// Admin sub-group
 	adminRoutes := p.Group("")
-	adminRoutes.Use(middleware.RequireAdmin())
+	adminRoutes.Use(middleware.AuthRequired(), middleware.RequireAdmin())
 	{
 		adminRoutes.POST("", controllers.CreateProduct)
 		adminRoutes.PUT("/:id", controllers.UpdateProduct)

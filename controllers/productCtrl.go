@@ -74,10 +74,16 @@ func UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	input.PID = existing.PID
-	config.DB.Save(&input)
+	existing.PName = input.PName
+	existing.PDescription = input.PDescription
+	existing.PlanDetail = input.PlanDetail
+	existing.WhatIsIncluded = input.WhatIsIncluded
+	existing.WhatIsNotIncluded = input.WhatIsNotIncluded
+	existing.Price = input.Price
+	existing.Dem = input.Dem
+	config.DB.Save(&existing)
 
-	c.JSON(200, input)
+	c.JSON(200, existing)
 }
 
 // Delete

@@ -51,6 +51,55 @@ async function testMe() {
     console.error("Me error:", err);
   }
 }
+async function createProduct() {
+  const product = {
+    pname: "oooommmmm yes",
+    pdescription: "A luxurious modern villa with 4 bedrooms",
+    plandetial: "Open floor plan with large windows",
+    whatisincluded: ["Foundation", "Walls", "Roof"],
+    whatisnotincluded: ["Furniture", "Landscaping"],
+    price: 250000,
+    dem: {
+      wi: 20,
+      hi: 10,
+      dep: 15
+    },
+    archistyles: [
+      { aname: "Modern" },
+      { aname: "Contemporary" }
+    ],
+    ceilings: [
+      { cname: "Living Room Ceiling", ctype: "Vaulted", hi: 12 }
+    ],
+    garages: [
+      { ty: "Attached", entrylocation: "Side", garea: 400, car: 2 }
+    ],
+    roofdetails: [
+      { detail: "Material", val: "Metal Roof" }
+    ],
+    specialfeatures: [
+      { sname: "Smart Home" },
+      { sname: "Solar Panels" }
+    ]
+  };
+
+  try {
+    const res = await fetch(`${BASE_URL}/products`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${authToken}`
+      },
+      body: JSON.stringify(product),
+    });
+    const data = await res.json();
+    console.log("Product created:", data);
+    return data.pid; // Return product ID for other tests
+  } catch (err) {
+    console.error("Create product error:", err);
+  }
+}
+
 
 // Run the test sequence
 (async () => {
@@ -61,4 +110,5 @@ async function testMe() {
   await testSignup();
   await testLogin();
   await testMe(); 
+  await createProduct()
 })();

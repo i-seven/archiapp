@@ -1,20 +1,25 @@
 package models
 
+import (
+	"gorm.io/datatypes"
+)
+
 type Dimension struct {
 	Wi  int `json:"wi"`
 	Hi  int `json:"hi"`
 	Dep int `json:"dep"`
 }
-type Product struct {
-	PID               int    `gorm:"primaryKey;column:pid" json:"pid"`
-	PName             string `gorm:"column:pname;not null" json:"pname"`
-	PDescription      string `gorm:"column:pdescription" json:"pdescription"`
-	PlanDetail        string `gorm:"column:plandetial" json:"plandetial"`
-	WhatIsIncluded    string `gorm:"column:whatisincluded" json:"whatisincluded"`
-	WhatIsNotIncluded string `gorm:"column:whatisnotincluded" json:"whatisnotincluded"`
-	Price             int    `gorm:"column:price" json:"price"`
 
-	Dem Dimension `gorm:"column:dem;type:dimension" json:"dem"`
+type Product struct {
+	PID               int            `gorm:"primaryKey;column:pid" json:"pid"`
+	PName             string         `gorm:"column:pname;not null" json:"pname"`
+	PDescription      string         `gorm:"column:pdescription" json:"pdescription"`
+	PlanDetail        string         `gorm:"column:plandetial" json:"plandetial"`
+	WhatIsIncluded    datatypes.JSON `gorm:"column:whatisincluded" json:"whatisincluded"`
+	WhatIsNotIncluded datatypes.JSON `gorm:"column:whatisnotincluded" json:"whatisnotincluded"`
+	Price             int            `gorm:"column:price" json:"price"`
+
+	Dem datatypes.JSON `gorm:"column:dem;type:dimension" json:"dem"`
 
 	// Relations
 	ArchiStyles     []ArchiStyle     `gorm:"foreignKey:PID" json:"archistyles"`
